@@ -16,7 +16,7 @@ jobs:
       - name: prepare and build the image
         uses: actions/checkout@v2
       - run: docker build -t tmtde/fpm-74 .
-      - run: docker run -i --rm -d tmtde/fpm-80
+      - run: docker run -i --rm -d tmtde/fpm-74
       - run: docker ps | grep -q fpm-74
       - run: docker run -i tmtde/fpm-74 php -v | grep -E "^PHP\s7\.4" || exit 1
       - run: docker run -i tmtde/fpm-74 composer --version || exit 1
