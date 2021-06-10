@@ -40,4 +40,4 @@ jobs:
     - name: Test composer
       run: docker run -i ${IMAGE_NAME} composer --version || exit 1
     - name: Testing characters
-      run: docker run -i ${IMAGE_NAME} php -r 'print (iconv("utf-8", "ASCII//TRANSLIT", "ströng contäning ümlaöits"));'
+      run: docker run -i ${IMAGE_NAME} php -r 'print (iconv("utf-8", "ASCII//TRANSLIT", "ströng contäning ümlaöits"));' || exit 1
