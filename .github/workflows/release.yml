@@ -27,7 +27,7 @@ jobs:
         run: |
           USER=${GITHUB_ACTOR}
           IMAGE_NAME=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}' | sed  s/docker-//)
-          DOCKER_IMAGE=${USER}/${IMAGE_NAME}
+          DOCKER_IMAGE=tmtde/${IMAGE_NAME}
           VERSION=edge
           # running on a tag
           if [[ $GITHUB_REF == refs/tags/* ]]; then
