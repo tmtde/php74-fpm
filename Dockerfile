@@ -1,3 +1,4 @@
+# hadolint ignore=DL4000
 FROM php:7.4-fpm-alpine
 
 MAINTAINER Thomas Trautmann <thomas.trautmann@tmt.de>
@@ -31,7 +32,7 @@ ENV EXT_DEPS \
   gettext-dev
 ENV COMPOSER_ALLOW_SUPERUSER 1
 
-# hadolint ignore=SC2086,DL3017,DL3018,DL4006,DL4000
+# hadolint ignore=SC2086,DL3017,DL3018,DL4006
 RUN set -xe; \
   apk --no-cache update && apk --no-cache upgrade \
   && apk add --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/community gnu-libiconv \
