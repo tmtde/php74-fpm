@@ -1,23 +1,43 @@
-name: PHP 7.4 Docker build
+name: Docker Image CI
 
 on:
   push:
-    branches: [ master ]
+    branches: 
+      - $default-branch
+      - development
+      - master
+    tags:
+      - '*.*.*-*'
+  # Run tests for any PRs
   pull_request:
-    branches: [ master ]
+
+env:
+  IMAGE_NAME: php74-fpm
 
 jobs:
-
-  test:
-
+  lint-docker-file:
     runs-on: ubuntu-latest
-
     steps:
-      - name: prepare and build the image
-        uses: actions/checkout@v2
-      - run: docker build -t tmtde/fpm-74 .
-      - run: docker run -i --rm -d tmtde/fpm-74
-      - run: docker ps | grep -q fpm-74
-      - run: docker run -i tmtde/fpm-74 php -v | grep -E "^PHP\s7\.4" || exit 1
-      - run: docker run -i tmtde/fpm-74 composer --version || exit 1
-      - run: docker run -i tmtde/fpm-74 php -r 'print (iconv("utf-8", "ASCII//TRANSLIT", "ströng contäning ümlaöits"));'
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: lint dockerfile
+      uses: brpaz/hadolint-action@master
+      with:
+        dockerfile: Dockerfile
+  build:
+    needs:
+      - lint-docker-file
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build the Docker image
+      run:  docker build . --file Dockerfile --build-arg BUILD_DATE="$(date -u +'%Y-%m-%dT%H:%M:%SZ')" --tag ${IMAGE_NAME}
+    - name: Test the Docker image
+      run: |
+        CONTAINER_OUTPUT="$(docker run --rm -t ${IMAGE_NAME} -v)"
+        TEST_STRING="$(echo "${CONTAINER_OUTPUT}" | grep -E '^PHP\s7\.4' | cut -d'.' -f3 --complement)"
+        if ! [ "${TEST_STRING}" = "PHP 7.4" ]; then exit 1; fi
+    - name: Test composer
+      run: docker run -i ${IMAGE_NAME} composer --version || exit 1
+    - name: Testing characters
+      run: docker run -i ${IMAGE_NAME} php -r 'print (iconv("utf-8", "ASCII//TRANSLIT", "ströng contäning ümlaöits"));' || exit 1
