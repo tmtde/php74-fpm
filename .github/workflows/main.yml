@@ -2,7 +2,7 @@ name: Docker Image CI
 
 on:
   push:
-    branches: 
+    branches:
       - $default-branch
       - development
       - master
@@ -71,7 +71,7 @@ jobs:
         ports:
           - 5000:5000
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
         with:
@@ -100,12 +100,12 @@ jobs:
       - name: Inspect the Docker image
         run: |
           docker buildx imagetools inspect localhost:5000/foobar/${{ env.IMAGE_NAME }}
-    - name: Test the Docker image
-      run: |
-        CONTAINER_OUTPUT="$(docker run --rm -t localhost:5000/foobar/${{ env.IMAGE_NAME }} -v)"
-        TEST_STRING="$(echo "${CONTAINER_OUTPUT}" | grep -E '^PHP\s7\.4' | cut -d'.' -f3 --complement)"
-        if ! [ "${TEST_STRING}" = "PHP 7.4" ]; then exit 1; fi
-    - name: Test composer
-      run: docker run -i localhost:5000/foobar/${{ env.IMAGE_NAME }} composer --version || exit 1
-    - name: Testing characters
-      run: docker run -i localhost:5000/foobar/${{ env.IMAGE_NAME }} php -r 'print (iconv("utf-8", "ASCII//TRANSLIT", "ströng contäning ümlaöits"));' || exit 1
+      - name: Test the Docker image
+        run: |
+          CONTAINER_OUTPUT="$(docker run --rm -t localhost:5000/foobar/${{ env.IMAGE_NAME }} -v)"
+          TEST_STRING="$(echo "${CONTAINER_OUTPUT}" | grep -E '^PHP\s7\.4' | cut -d'.' -f3 --complement)"
+          if ! [ "${TEST_STRING}" = "PHP 7.4" ]; then exit 1; fi
+      - name: Test composer
+        run: docker run -i localhost:5000/foobar/${{ env.IMAGE_NAME }} composer --version || exit 1
+      - name: Testing characters
+        run: docker run -i localhost:5000/foobar/${{ env.IMAGE_NAME }} php -r 'print (iconv("utf-8", "ASCII//TRANSLIT", "ströng contäning ümlaöits"));' || exit 1
